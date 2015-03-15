@@ -1,0 +1,20 @@
+{
+  "name": "kmins",
+  "version": "0.1.0",
+  "description": "let's code: k-means demo",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "k-means",
+    "code",
+    "demo"
+  ],
+  "author": "Andrei Kashcha",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anvaka/kmins"
+  }
+}
