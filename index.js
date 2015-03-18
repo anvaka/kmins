@@ -93,7 +93,7 @@ function kmeans(points, clustersCount) {
 }
 
 function Cluster(centroid) {
-  this.centroid = new Point(centroid.x, centroid.y, centroid.y);
+  this.centroid = new Point(centroid.x, centroid.y, centroid.z);
   this.points = [];
   this._dirty = false;
 }
