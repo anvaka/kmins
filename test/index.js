@@ -10,9 +10,9 @@ test('it can compute clusters', function(t) {
     { x: -10, y: 0, z: 0 },
 
     // second cluster
-    { y: -10, x: 0, z: 0 },
-    { y: -10, x: 0, z: 0 },
-    { y: -10, x: 0, z: 0 },
+    { y: -10, x: 0, z: 10 },
+    { y: -10, x: 0, z: 12 },
+    { y: -10, x: 0, z: 14 },
   ];
 
   var numberOfClusters = 2;
