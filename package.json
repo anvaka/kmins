@@ -4,7 +4,7 @@
   "description": "let's code: k-means demo",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "tap test/*.js"
   },
   "keywords": [
     "k-means",
