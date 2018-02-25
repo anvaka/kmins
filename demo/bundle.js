@@ -3,8 +3,13 @@ var kmeans = require('../');
 
 window.onload = function () {
   var points = getPointsFromImage(document.getElementById('scene'));
-
-  var algorithm = kmeans(points, 3);
+  var clusterCount = 3;
+  var cMatch = window.location.search.match(/q=(\d+)/);
+  if (cMatch) {
+    var x = Number.parseInt(cMatch[1], 10);
+    if (Number.isFinite(x)) clusterCount = x;
+  }
+  var algorithm = kmeans(points, clusterCount);
 
   while (algorithm.step()) {}
 
