@@ -50,11 +50,11 @@ function getPointsFromImage(img) {
   var imgData = ctx.getImageData(0, 0, width, height);
   var source = imgData.data;
 
-  for (var i = 0; i < source.length/4; i += 4) {
+  for (var i = 0; i < source.length; i += 4) {
     points.push({
-      x: source[i * 4],
-      y: source[i * 4 + 1],
-      z: source[i * 4 + 2]
+      x: source[i],
+      y: source[i + 1],
+      z: source[i + 2]
     });
   }
 
