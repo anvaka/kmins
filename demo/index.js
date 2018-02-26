@@ -1,19 +1,51 @@
 var kmeans = require('../');
+var loadImage = require('./loadImage.js');
 
 window.onload = function () {
-  var points = getPointsFromImage(document.getElementById('scene'));
+  loadImage('arches.jpg').then(run)
+}
 
-  var algorithm = kmeans(points, 3);
+function run(image) {
+  document.querySelector('#srcImage').appendChild(image);
+  var points = getPointsFromImage(image);
 
-  while (algorithm.step()) {}
+  var clusterCount = 3;
+  var cMatch = window.location.search.match(/q=(\d+)/);
+  if (cMatch) {
+    var x = Number.parseInt(cMatch[1], 10);
+    if (Number.isFinite(x)) clusterCount = x;
+  }
+
+  var algorithm = kmeans(points, clusterCount);
+
+  var counter = 0;
+  computeNext()
+
+  function computeNext() {
+    while (algorithm.step()) {
+      counter += 1;
+      if (counter % 10) {
+        renderAllClusters(algorithm)
+      }
+      setTimeout(computeNext, 0);
+      return;
+    }
+
+    renderAllClusters(algorithm);
+  }
+}
+
+function renderAllClusters(algorithm) {
+  var container = document.querySelector('#clusters');
+  container.innerHTML = '';
 
   var clusters = algorithm.getClusters();
   for (var i = 0; i < clusters.length; ++i) {
-    renderCluster(clusters[i]);
+    renderCluster(container, clusters[i]);
   }
-};
+}
 
-function renderCluster(cluster) {
+function renderCluster(container, cluster) {
   var points = cluster.points;
   var size = Math.ceil(Math.sqrt(points.length));
 
@@ -34,7 +66,7 @@ function renderCluster(cluster) {
   }
 
   ctx.putImageData(imgData, 0, 0);
-  document.body.appendChild(canvas);
+  container.appendChild(canvas);
 }
 
 function getPointsFromImage(img) {
@@ -49,11 +81,11 @@ function getPointsFromImage(img) {
   var imgData = ctx.getImageData(0, 0, width, height);
   var source = imgData.data;
 
-  for (var i = 0; i < source.length/4; i += 4) {
+  for (var i = 0; i < source.length; i += 4) {
     points.push({
-      x: source[i * 4],
-      y: source[i * 4 + 1],
-      z: source[i * 4 + 2]
+      x: source[i + 0],
+      y: source[i + 1],
+      z: source[i + 2]
     });
   }
 

@@ -1,25 +1,52 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
 var kmeans = require('../');
+var loadImage = require('./loadImage.js');
 
 window.onload = function () {
-  var points = getPointsFromImage(document.getElementById('scene'));
+  loadImage('arches.jpg').then(run)
+}
+
+function run(image) {
+  document.querySelector('#srcImage').appendChild(image);
+  var points = getPointsFromImage(image);
+
   var clusterCount = 3;
   var cMatch = window.location.search.match(/q=(\d+)/);
   if (cMatch) {
     var x = Number.parseInt(cMatch[1], 10);
     if (Number.isFinite(x)) clusterCount = x;
   }
+
   var algorithm = kmeans(points, clusterCount);
 
-  while (algorithm.step()) {}
+  var counter = 0;
+  computeNext()
+
+  function computeNext() {
+    while (algorithm.step()) {
+      counter += 1;
+      if (counter % 10) {
+        renderAllClusters(algorithm)
+      }
+      setTimeout(computeNext, 0);
+      return;
+    }
+
+    renderAllClusters(algorithm);
+  }
+}
+
+function renderAllClusters(algorithm) {
+  var container = document.querySelector('#clusters');
+  container.innerHTML = '';
 
   var clusters = algorithm.getClusters();
   for (var i = 0; i < clusters.length; ++i) {
-    renderCluster(clusters[i]);
+    renderCluster(container, clusters[i]);
   }
-};
+}
 
-function renderCluster(cluster) {
+function renderCluster(container, cluster) {
   var points = cluster.points;
   var size = Math.ceil(Math.sqrt(points.length));
 
@@ -40,7 +67,7 @@ function renderCluster(cluster) {
   }
 
   ctx.putImageData(imgData, 0, 0);
-  document.body.appendChild(canvas);
+  container.appendChild(canvas);
 }
 
 function getPointsFromImage(img) {
@@ -57,7 +84,7 @@ function getPointsFromImage(img) {
 
   for (var i = 0; i < source.length; i += 4) {
     points.push({
-      x: source[i],
+      x: source[i + 0],
       y: source[i + 1],
       z: source[i + 2]
     });
@@ -66,7 +93,29 @@ function getPointsFromImage(img) {
   return points;
 }
 
-},{"../":2}],2:[function(require,module,exports){
+},{"../":3,"./loadImage.js":2}],2:[function(require,module,exports){
+module.exports = loadImage;
+
+function loadImage(src) {
+  var resolveImage, rejectImage;
+
+  var image = new Image();
+  image.crossOrigin = '';
+
+  image.onload = imageLoaded;
+  image.onerror = reportError;
+  image.src = src;
+
+  return new Promise((resolve, reject) => {
+    resolveImage = resolve;
+    rejectImage = reject; 
+  });
+
+  function reportError(err) { rejectImage(err); }
+  function imageLoaded() { resolveImage(image); }
+}
+
+},{}],3:[function(require,module,exports){
 module.exports = kmeans;
 
 function kmeans(points, clustersCount) {
